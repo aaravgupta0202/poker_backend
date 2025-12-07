@@ -1,0 +1,61 @@
+services:
+  # FastAPI Backend
+  - type: web
+    name: poker-backend
+    env: python
+    region: oregon  # or singapore, frankfurt, ohio, etc.
+    plan: free  # or starter, standard, pro
+    
+    # Build Command
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    
+    # Start Command
+    startCommand: |
+      uvicorn main:app --host 0.0.0.0 --port $PORT
+    
+    # Health Check
+    healthCheckPath: /
+    
+    # Auto-deploy from Git
+    autoDeploy: true
+    branch: main
+    
+    # Environment Variables
+    envVars:
+      - key: REDIS_HOST
+        sync: false  # Set this manually in Render dashboard
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: PORT
+        value: 10000
+    
+    # Scaling
+    # numInstances: 1  # For paid plans
+    
+    # Disk
+    disk:
+      name: poker-data
+      mountPath: /data
+      sizeGB: 1
+
+  # Redis Database (optional - use Redis Cloud instead)
+  # - type: redis
+  #   name: poker-redis
+  #   region: oregon
+  #   ipAllowList:
+  #     - source: 0.0.0.0/0
+  #       description: everywhere
+  #   plan: free
+  #   maxmemoryPolicy: allkeys-lru
+
+# Database (if needed later)
+# databases:
+#   - name: pokerdb
+#     region: oregon
+#     plan: free
+#     databaseName: poker
+#     user: pokeruser
